@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tf11c_0031_codiego4_qr/pages/scanner_page.dart';
+import 'package:tf11c_0031_codiego4_qr/data/data.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
   @override
   Widget build(BuildContext context) {
+    print(Data().qrList);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -22,8 +22,10 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
-        itemCount: 10,
+        itemCount: Data().qrList.length,
         itemBuilder: (BuildContext context, int index) {
+          Map qrData = Data().qrList[index];
+
           return Container(
             margin: EdgeInsets.symmetric(
               horizontal: 10,
@@ -43,7 +45,7 @@ class HomePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Carta del menu de la esquina dfdsfdsfsd sdfsd f sdf sd f sd f",
+                        qrData["description"],
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.normal,

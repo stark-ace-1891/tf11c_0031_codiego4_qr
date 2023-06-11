@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:tf11c_0031_codiego4_qr/data/data.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({super.key});
@@ -14,6 +15,7 @@ class _ScannerPageState extends State<ScannerPage> {
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  TextEditingController descriptionController = TextEditingController();
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -72,11 +74,81 @@ class _ScannerPageState extends State<ScannerPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(Data().qrList);
     return Scaffold(
       body: Column(
         children: [
           Expanded(
             child: _buildQrView(context),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 20,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  "https://www.youtube.com/watch?v=gSvMkyOA2bc&ab_channel=Eng.MahmoudEnan",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    hintText: "Ingresa una descripcion",
+                    filled: true,
+                    fillColor: Colors.black.withOpacity(0.06),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 48,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Data().qrList.add({
+                        "id": Data().qrList.length + 1,
+                        "description": descriptionController.text,
+                        "qr": "url",
+                      });
+                      // print(Data().qrList);
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Registrar",
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
