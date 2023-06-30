@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:tf11c_0031_codiego4_qr/models/qr_model.dart';
 import 'package:tf11c_0031_codiego4_qr/pages/scanner_page.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +13,66 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   CollectionReference qrCollection =
       FirebaseFirestore.instance.collection('qr_collection');
+
+  void showDetailQR(QrModel model) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final dateFormat =
+            DateFormat('dd/MM/yyyy - HH:mm').format(model.datetime.toDate());
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Detalle QR",
+              ),
+              const Divider(),
+              Row(
+                children: [
+                  Text(
+                    "Descripción: ",
+                  ),
+                  Expanded(
+                    child: Text(model.description),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Fecha: ",
+                  ),
+                  Expanded(
+                    child: Text(
+                      dateFormat,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              SizedBox(
+                height: 120,
+                width: 120,
+                child: QrImageView(
+                  data: model.qr,
+                  version: QrVersions.auto,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +97,16 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           "Listado General",
         ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.import_export),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.picture_as_pdf),
+          ),
+        ],
       ),
       // body: ListView.builder(
       //   itemCount: Data().qrList.length,
@@ -220,7 +291,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       IconButton(
                         icon: Icon(Icons.qr_code),
-                        onPressed: () {},
+                        onPressed: () {
+                          showDetailQR(model);
+                        },
                       ),
                     ],
                   ),
