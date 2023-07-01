@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:excel/excel.dart' as excel;
 import 'package:path_provider/path_provider.dart';
-// import 'package:open_filex/open_filex.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:tf11c_0031_codiego4_qr/models/qr_model.dart';
 import 'package:tf11c_0031_codiego4_qr/pages/scanner_page.dart';
 import 'package:intl/intl.dart';
@@ -155,6 +159,103 @@ class _HomePageState extends State<HomePage> {
     File fileExcel = File("${directory.path}/reporteExcel.xlsx");
     fileExcel.createSync(recursive: true);
     fileExcel.writeAsBytesSync(bytes!);
+    OpenFilex.open("${directory.path}/reporteExcel.xlsx");
+  }
+
+  exportPdf() async {
+    List<QrModel> data = await getDataQR();
+
+    ByteData byteData = await rootBundle.load("assets/images/logo.png");
+    Uint8List bytesLogo = byteData.buffer.asUint8List();
+
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Image(
+                  pw.MemoryImage(bytesLogo),
+                  height: 80,
+                ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "Telefono: 15456465",
+                    ),
+                    pw.Text(
+                      "Direccion: Av. Tester 123",
+                    ),
+                    pw.Text(
+                      "Email: abc@test.com",
+                    ),
+                    pw.Text(
+                      "Contacto: Juan Lopez",
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            pw.ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (pw.Context context, int index) {
+                return pw.Container(
+                  margin: pw.EdgeInsets.all(6),
+                  padding: pw.EdgeInsets.all(8),
+                  decoration: pw.BoxDecoration(
+                    borderRadius: pw.BorderRadius.circular(8),
+                    border: pw.Border.all(
+                      width: 0.9,
+                      color: PdfColors.black,
+                    ),
+                  ),
+                  child: pw.Column(
+                    children: [
+                      pw.Row(
+                        children: [
+                          pw.Text("ID: "),
+                          pw.Text("${index + 1}"),
+                        ],
+                      ),
+                      pw.Row(
+                        children: [
+                          pw.Text("Descripcion: "),
+                          pw.Text("${data[index].description}"),
+                        ],
+                      ),
+                      pw.Row(
+                        children: [
+                          pw.Text("Fecha: "),
+                          pw.Text("${data[index].datetime.toString()}"),
+                        ],
+                      ),
+                      pw.Row(
+                        children: [
+                          pw.Text("QR: "),
+                          pw.Expanded(
+                            child: pw.Text("${data[index].qr}"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ];
+        },
+      ),
+    );
+    Uint8List bytes = await pdf.save();
+    Directory directory = await getApplicationDocumentsDirectory();
+    File filePDF = File("${directory.path}/reportePDF.pdf");
+    filePDF.createSync(recursive: true);
+    filePDF.writeAsBytesSync(bytes!);
+    OpenFilex.open("${directory.path}/reportePDF.pdf");
   }
 
   @override
@@ -188,7 +289,9 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.import_export),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              exportPdf();
+            },
             icon: Icon(Icons.picture_as_pdf),
           ),
         ],
