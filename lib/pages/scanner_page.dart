@@ -142,6 +142,7 @@ class _ScannerPageState extends State<ScannerPage> {
                         description: descriptionController.text,
                         datetime: Timestamp.fromDate(DateTime.now()),
                         qr: qrValue,
+                        price: 0,
                       );
 
                       Data().addQr(model);

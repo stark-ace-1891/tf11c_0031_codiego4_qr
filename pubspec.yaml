@@ -44,6 +44,8 @@ dependencies:
   path_provider: ^2.0.15
   open_filex: ^4.3.2
   pdf: ^3.10.4
+  share_plus: ^7.0.2
+  syncfusion_flutter_charts: ^22.1.36
 
 dev_dependencies:
   flutter_test:
