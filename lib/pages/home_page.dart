@@ -74,6 +74,21 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  getDataQR() async {
+    QuerySnapshot collection = await qrCollection.get();
+    List<QueryDocumentSnapshot> docs = collection.docs;
+    List<QrModel> qrList = [];
+    // for (var item in docs) {
+    //   Map<String, dynamic> data = item.data() as Map<String, dynamic>;
+    //   QrModel model = QrModel.fromJson(data);
+    //   qrList.add(model);
+    // }
+    qrList = docs
+        .map((e) => QrModel.fromJson(e.data() as Map<String, dynamic>))
+        .toList();
+    return qrList;
+  }
+
   @override
   Widget build(BuildContext context) {
     qrCollection.get().then((value) {
