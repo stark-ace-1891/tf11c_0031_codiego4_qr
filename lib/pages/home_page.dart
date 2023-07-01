@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:excel/excel.dart' as excel;
+import 'package:path_provider/path_provider.dart';
+// import 'package:open_filex/open_filex.dart';
 import 'package:tf11c_0031_codiego4_qr/models/qr_model.dart';
 import 'package:tf11c_0031_codiego4_qr/pages/scanner_page.dart';
 import 'package:intl/intl.dart';
@@ -89,6 +94,69 @@ class _HomePageState extends State<HomePage> {
     return qrList;
   }
 
+  exportExcel() async {
+    List<QrModel> data = await getDataQR();
+    excel.Excel myExcel = excel.Excel.createExcel();
+    excel.Sheet? sheet = myExcel.sheets[myExcel.getDefaultSheet()];
+    sheet!
+        .cell(excel.CellIndex.indexByColumnRow(
+          columnIndex: 0,
+          rowIndex: 0,
+        ))
+        .value = "ID";
+    sheet!
+        .cell(excel.CellIndex.indexByColumnRow(
+          columnIndex: 1,
+          rowIndex: 0,
+        ))
+        .value = "Descripcion";
+    sheet!
+        .cell(excel.CellIndex.indexByColumnRow(
+          columnIndex: 2,
+          rowIndex: 0,
+        ))
+        .value = "Fecha";
+    sheet!
+        .cell(excel.CellIndex.indexByColumnRow(
+          columnIndex: 3,
+          rowIndex: 0,
+        ))
+        .value = "QR";
+
+    for (var i = 0; i < data.length; i++) {
+      sheet!
+          .cell(excel.CellIndex.indexByColumnRow(
+            columnIndex: 0,
+            rowIndex: i + 1,
+          ))
+          .value = i + 1;
+      sheet!
+          .cell(excel.CellIndex.indexByColumnRow(
+            columnIndex: 1,
+            rowIndex: i + 1,
+          ))
+          .value = data[i].description;
+      sheet!
+          .cell(excel.CellIndex.indexByColumnRow(
+            columnIndex: 2,
+            rowIndex: i + 1,
+          ))
+          .value = data[i].datetime.toString();
+      sheet!
+          .cell(excel.CellIndex.indexByColumnRow(
+            columnIndex: 3,
+            rowIndex: i + 1,
+          ))
+          .value = data[i].qr;
+    }
+
+    Directory directory = await getApplicationDocumentsDirectory();
+    List<int>? bytes = myExcel.save();
+    File fileExcel = File("${directory.path}/reporteExcel.xlsx");
+    fileExcel.createSync(recursive: true);
+    fileExcel.writeAsBytesSync(bytes!);
+  }
+
   @override
   Widget build(BuildContext context) {
     qrCollection.get().then((value) {
@@ -114,7 +182,9 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              exportExcel();
+            },
             icon: Icon(Icons.import_export),
           ),
           IconButton(
