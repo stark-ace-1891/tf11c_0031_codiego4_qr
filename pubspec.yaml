@@ -46,6 +46,7 @@ dependencies:
   pdf: ^3.10.4
   share_plus: ^7.0.2
   syncfusion_flutter_charts: ^22.1.36
+  firebase_messaging: ^14.6.4
 
 dev_dependencies:
   flutter_test:
